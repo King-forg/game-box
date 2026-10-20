@@ -1,219 +1,216 @@
-#Naughts And Crosses game
+# Naughts and crosses game
 
 import random
 
+
+WINNING_LINES = (
+    ((0, 0), (0, 1), (0, 2)),
+    ((1, 0), (1, 1), (1, 2)),
+    ((2, 0), (2, 1), (2, 2)),
+    ((0, 0), (1, 0), (2, 0)),
+    ((0, 1), (1, 1), (2, 1)),
+    ((0, 2), (1, 2), (2, 2)),
+    ((0, 0), (1, 1), (2, 2)),
+    ((0, 2), (1, 1), (2, 0)),
+)
+
+grid = []
+
+
+def new_grid():
+    global grid
+    grid = [["#" for _ in range(3)] for _ in range(3)]
+
+
+def display_grid():
+    for row in grid:
+        print(" ".join(row))
+
+
 def start(players):
-    if players == 1 or players == 2:
-        print("Players = {players}")
-    else:
-        players = int(input("Number of players? (1/2)\n"))
     if players == 1:
         singleplayer()
     elif players == 2:
         multiplayer()
     else:
-        print("Error")
+        print("Please select 1 or 2 players.")
+
 
 def singleplayer():
-    global grid
+    new_grid()
     print("Welcome to naughts and crosses.")
-    grid = [[""],[""],[""]],[[""],[""],[""]],[[""],[""],[""]]
-    for i in range(3):
-        for j in range(3):
-            grid[i][j] = "#"
-    print("",grid[0][0],grid[0][1],grid[0][2],"\n",grid[1][0],grid[1][1],grid[1][2],"\n",grid[2][0],grid[2][1],grid[2][2])
-    choice = random.randint(1,2)
-    if choice == 1:
-        print("You start first")
-        singleplayerp1()
-    elif choice == 2:
-        print("Computer starts first")
-        singleplayerp2()
+    difficulty = choose_difficulty()
+    player_turn = random.choice((1, 2))
+
+    while True:
+        display_grid()
+        if player_turn == 1:
+            print("Your turn...")
+            x, y = read_move()
+            place(1, x, y)
+        else:
+            print("Computer is thinking...")
+            x, y = bot_move(difficulty)
+            place(2, x, y)
+
+        if wintest() or istie():
+            if not has_winner("X") and not has_winner("O"):
+                print("It's a tie!")
+            return
+        player_turn = 2 if player_turn == 1 else 1
+
 
 def multiplayer():
-    global grid
+    new_grid()
     print("Welcome to naughts and crosses.")
-    grid = [[""],[""],[""]],[[""],[""],[""]],[[""],[""],[""]]
-    for i in range(3):
-        for j in range(3):
-            grid[i][j] = "#"
-    print("",grid[0][0],grid[0][1],grid[0][2],"\n",grid[1][0],grid[1][1],grid[1][2],"\n",grid[2][0],grid[2][1],grid[2][2])
-    first = random.randint(1,2)
-    if first == 1:
-        print("Player 1 starts first")
-        selectp1()
-        loopp1()
-    elif first == 2:
-        print("Player 2 starts first")
-        selectp2()
-        loopp2()
+    player_turn = random.choice((1, 2))
+    print(f"Player {player_turn} starts first")
 
-def singleplayerp1():
-    global grid
-    print("",grid[0][0],grid[0][1],grid[0][2],"\n",grid[1][0],grid[1][1],grid[1][2],"\n",grid[2][0],grid[2][1],grid[2][2])
-    selectionx = int(input("Please select first grid reference (1,3 of rows) \n"))
-    selectiony = int(input("Please select second grid reference (1,3 of columns) \n"))
-    placed = place(1, selectionx, selectiony)
-    if placed == False:
-        singleplayerp1()
-    elif placed == True:
-        if wintest():
-            import main
-            main.main()
-        elif istie():
-            import main
-            print("It's a tie!")
-            main.main()
-        else:
-            singleplayerp2()
-
-def singleplayerp2():
-    global grid
-    print("",grid[0][0],grid[0][1],grid[0][2],"\n",grid[1][0],grid[1][1],grid[1][2],"\n",grid[2][0],grid[2][1],grid[2][2])
-    print("Thinking...")
-    print("Disclaimer: This is a very basic bot with no prediction yet. Purely just to get it working currently")
-    selectionx = random.randint(1,3)
-    selectiony = random.randint(1,3)
-    placed = place(2, selectionx, selectiony)
-    if placed == False:
-        singleplayerp2()
-    elif placed == True:
-        if wintest():
-            import main
-            main.main()
-        elif istie():
-            import main
-            print("It's a tie!")
-            main.main()
-        else:
-            singleplayerp1()
-    
-    
-
-
-def selectp1():
-    print("Player 1's turn...")
-    selectionx = int(input("Please select first grid reference (1,3 of rows) \n"))
-    selectiony = int(input("Please select second grid reference (1,3 of columns) \n"))
-    placed = place(1, selectionx, selectiony)
-    if placed == False:
-        selectp1()
-    elif placed:
-        won = wintest()
-        if won or istie():
-            import main
-            if not won:
+    while True:
+        display_grid()
+        print(f"Player {player_turn}'s turn...")
+        x, y = read_move()
+        place(player_turn, x, y)
+        if wintest() or istie():
+            if not has_winner("X") and not has_winner("O"):
                 print("It's a tie!")
-            main.main()
+            return
+        player_turn = 2 if player_turn == 1 else 1
+
+
+def choose_difficulty():
+    while True:
+        difficulty = input("Choose difficulty: 1-Easy, 2-Medium, 3-Hard\n").strip().lower()
+        if difficulty in ("1", "easy"):
+            return "easy"
+        if difficulty in ("2", "medium"):
+            return "medium"
+        if difficulty in ("3", "hard"):
+            return "hard"
+        print("Please choose easy, medium, or hard.")
+
+
+def read_move():
+    while True:
+        try:
+            x = int(input("Please select the row (1-3).\n"))
+            y = int(input("Please select the column (1-3).\n"))
+        except ValueError:
+            print("Please enter numbers from 1 to 3.")
+            continue
+        if place(1, x, y, preview=True):
+            return x, y
+        print("Please choose an available square.")
+
+
+def place(player, x, y, preview=False):
+    if player not in (1, 2) or not (1 <= x <= 3 and 1 <= y <= 3):
+        return False
+    row = x - 1
+    column = y - 1
+    if grid[row][column] != "#":
+        return False
+    if preview:
+        return True
+    grid[row][column] = "X" if player == 1 else "O"
+    print(f"Successfully taken coordinate ({x},{y})")
+    return True
+
+
+def available_moves():
+    return [
+        (row, column)
+        for row in range(3)
+        for column in range(3)
+        if grid[row][column] == "#"
+    ]
+
+
+def bot_move(difficulty):
+    moves = available_moves()
+    if difficulty == "easy":
+        row, column = random.choice(moves)
+        return row + 1, column + 1
+
+    winning = find_tactical_move("O")
+    if winning:
+        return winning
+    blocking = find_tactical_move("X")
+    if blocking:
+        return blocking
+    if difficulty == "hard":
+        row, column = minimax_move()
+        return row + 1, column + 1
+    row, column = random.choice(moves)
+    return row + 1, column + 1
+
+
+def find_tactical_move(marker):
+    for row, column in available_moves():
+        grid[row][column] = marker
+        wins = has_winner(marker)
+        grid[row][column] = "#"
+        if wins:
+            return row + 1, column + 1
+    return None
+
+
+def minimax_move():
+    best_score = -float("inf")
+    best_move = None
+    cache = {}
+    for row, column in available_moves():
+        grid[row][column] = "O"
+        score = minimax(False, cache)
+        grid[row][column] = "#"
+        if score > best_score:
+            best_score = score
+            best_move = (row, column)
+    return best_move
+
+
+def minimax(bot_turn, cache):
+    state = tuple(tuple(row) for row in grid)
+    cache_key = (state, bot_turn)
+    if cache_key in cache:
+        return cache[cache_key]
+
+    if has_winner("O"):
+        score = 1
+    elif has_winner("X"):
+        score = -1
+    else:
+        moves = available_moves()
+        if not moves:
+            score = 0
         else:
-            loopp1()
-    
+            scores = []
+            marker = "O" if bot_turn else "X"
+            for row, column in moves:
+                grid[row][column] = marker
+                scores.append(minimax(not bot_turn, cache))
+                grid[row][column] = "#"
+            score = max(scores) if bot_turn else min(scores)
 
-def selectp2():
-    print("Player 2's turn...")
-    selectionx = int(input("Please select first grid reference (1,3 of rows) \n"))
-    selectiony = int(input("Please select second grid reference (1,3 of columns) \n"))
-    placed = place(2, selectionx, selectiony)
-    if placed == False:
-        selectp2()
-    elif placed:
-        won = wintest()
-        if won or istie():
-            import main
-            if not won:
-                print("It's a tie!")
-            main.main()
-        else:
-            loopp2()
+    cache[cache_key] = score
+    return score
 
-def place(player, x, y):
-    global grid
-    if x == 1:
-        if y == 1:
-            coordinate1 = 0
-            coordinate2 = 0
-        elif y == 2:
-            coordinate1 = 0
-            coordinate2 = 1
-        elif y == 3:
-            coordinate1 = 0
-            coordinate2 = 2
-    elif x == 2:
-        if y == 1:
-            coordinate1 = 1
-            coordinate2 = 0
-        elif y == 2:
-            coordinate1 = 1
-            coordinate2 = 1
-        elif y == 3:
-            coordinate1 = 1
-            coordinate2 = 2
-    elif x == 3:
-        if y == 1:
-            coordinate1 = 2
-            coordinate2 = 0
-        elif y == 2:
-            coordinate1 = 2
-            coordinate2 = 1
-        elif y == 3:
-            coordinate1 = 2
-            coordinate2 = 2
 
-    if player == 1:
-        if grid[coordinate1][coordinate2] == "O":
-            print("That place is taken.")
-            return False
-        elif grid[coordinate1][coordinate2] == "X":
-            print("That place is taken.")
-            return False
-        else:
-            grid[coordinate1][coordinate2] = "X"
-            print(f"Successfully taken coordinate ({x},{y})")
-            return True
-
-    elif player == 2:
-        if grid[coordinate1][coordinate2] == "X":
-            print("That place is taken.")
-            return False
-        elif grid[coordinate1][coordinate2]== "O":
-            print("That place is taken.")
-            return False
-        else:
-            grid[coordinate1][coordinate2] = "O"
-            print(f"Successfully taken coordinate ({x},{y})")
-            return True
-    
-
-def loopp1():
-    global grid
-    print("",grid[0][0],grid[0][1],grid[0][2],"\n",grid[1][0],grid[1][1],grid[1][2],"\n",grid[2][0],grid[2][1],grid[2][2])
-    selectp2()
-
-def loopp2():
-    global grid
-    print("",grid[0][0],grid[0][1],grid[0][2],"\n",grid[1][0],grid[1][1],grid[1][2],"\n",grid[2][0],grid[2][1],grid[2][2])
-    selectp1()
-
-def wintest():
-    global grid
-    winning_lines = (
-        (grid[0][0], grid[0][1], grid[0][2]),
-        (grid[1][0], grid[1][1], grid[1][2]),
-        (grid[2][0], grid[2][1], grid[2][2]),
-        (grid[0][0], grid[1][0], grid[2][0]),
-        (grid[0][1], grid[1][1], grid[2][1]),
-        (grid[0][2], grid[1][2], grid[2][2]),
-        (grid[0][0], grid[1][1], grid[2][2]),
-        (grid[0][2], grid[1][1], grid[2][0]),
+def has_winner(marker):
+    return any(
+        all(grid[row][column] == marker for row, column in line)
+        for line in WINNING_LINES
     )
 
-    for line in winning_lines:
-        if line[0] != "#" and line[0] == line[1] == line[2]:
-            print("Player 1 wins!" if line[0] == "X" else "Player 2 wins!")
+
+def wintest():
+    for marker in ("X", "O"):
+        if has_winner(marker):
+            print("Player 1 wins!" if marker == "X" else "Player 2 wins!")
+            display_grid()
             return True
     return False
 
 
 def istie():
-    global grid
-    return all(cell != "#" for row in grid for cell in row)
+    return not available_moves()
