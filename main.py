@@ -10,9 +10,11 @@ def selections():
 
         selection = input(
             "Select the game: \n"
-            "Num    Name              Max players\n"
-            "1 - Naughts and Crosses - 2\n"
-            "2 - Higher or lower     - 1\n"
+            "Num    Name\n"
+            "1 - Naughts and Crosses\n"
+            "2 - Higher or lower\n"
+            "3 - 21\n"
+            "4 - Blackjack\n"
         ).strip().lower()
 
         if selection in ("1", "naughts and crosses"):
@@ -27,6 +29,18 @@ def selections():
                 higherorlower.main()
             else:
                 print("Higher or lower supports 1 player.")
+        elif selection in ("3", "21"):
+            if players <= 2:
+                import twentyone
+                twentyone.start(players)
+            else:
+                print("21 only supports 1 or 2 players")
+        elif selection in ("4", "blackjack"):
+                    if players <= 4:
+                        import blackjack
+                        blackjack.start()
+                    else:
+                        print("Blackjack only supports up to 4 players")
         else:
             print("Please select game 1 or 2.")
 

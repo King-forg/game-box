@@ -58,7 +58,7 @@ def loop1(players):
 def main():
     while True:
         try:
-            turns = int(input("How many turns would you like?\n"))
+            turns = int(input("How many games would you like?\n"))
         except ValueError:
             print("Please enter a whole number.")
             continue
