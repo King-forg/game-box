@@ -187,6 +187,7 @@ def p2go():
     p1go()
 
 def start(players):
+    print("Welcome to 21 (Nim). The aim of the game is to not be the one to get to 21.\nYou choose a number to increment between 1 2 or 3.")
     if players == 1:
         singleplayer()
     elif players == 2:

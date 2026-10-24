@@ -2,6 +2,7 @@
 
 def selections():
     while True:
+        print("Welcome to the game box!")
         try:
             players = int(input("How many players?\n"))
         except ValueError:
@@ -13,8 +14,9 @@ def selections():
             "Num    Name\n"
             "1 - Naughts and Crosses\n"
             "2 - Higher or lower\n"
-            "3 - 21\n"
+            "3 - 21 (Nim)\n"
             "4 - Blackjack\n"
+            "5 - Connect 4\n"
         ).strip().lower()
 
         if selection in ("1", "naughts and crosses"):
@@ -36,11 +38,17 @@ def selections():
             else:
                 print("21 only supports 1 or 2 players")
         elif selection in ("4", "blackjack"):
-                    if players <= 4:
+                    if players == 1:
                         import blackjack
                         blackjack.start()
                     else:
-                        print("Blackjack only supports up to 4 players")
+                        print("Blackjack only supports 1 player")
+        elif selection in ("5", "connect 4"):
+                    if players <= 2:
+                        import connect4
+                        connect4.start(players)
+                    else:
+                         print("Connect 4 only supports up to 2 players")
         else:
             print("Please select game 1 or 2.")
 

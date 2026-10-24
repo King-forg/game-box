@@ -12,5 +12,6 @@ You heard me right! That means:
   - Naughts and crosses (About 50% human coded but the other 50% is the bot prediction code which I couldnt be bothered to do)
   - 21 (Nim) (100% Human coded)
   - Blackjack (~80% human coded (most was just debugging))
+  - Connect 4 (~75% human coded (Most was for repetitive tasks like wintesting and bots))
 
 Sometimes I just cant fix bugs so I use the copilot to debug them. (Dont worry moderators all of the ai coding time was recorded accordingly)
