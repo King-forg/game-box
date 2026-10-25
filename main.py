@@ -16,7 +16,8 @@ def selections():
             "2 - Higher or lower\n"
             "3 - 21 (Nim)\n"
             "4 - Blackjack\n"
-            "5 - Connect 4\n"
+            "5 - Connect 4\n" 
+            "6 - Rock Paper Scissors\n"
         ).strip().lower()
 
         if selection in ("1", "naughts and crosses"):
@@ -49,6 +50,12 @@ def selections():
                         connect4.start(players)
                     else:
                          print("Connect 4 only supports up to 2 players")
+        elif selection in ("6", "rock paper scissors"):
+            if players == 1:
+                  import rockpaperscissors
+                  rockpaperscissors.start(players)
+            else:
+                 print("Rock paper scissors only supports 1 player")
         else:
             print("Please select game 1 or 2.")
 
