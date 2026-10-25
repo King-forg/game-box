@@ -4,10 +4,16 @@ def selections():
     while True:
         print("Welcome to the game box!")
         try:
-            players = int(input("How many players?\n"))
+            players = int(input("How many players? (1/2) \n"))
         except ValueError:
             print("Please enter 1 or 2.")
             continue
+        while players != 1 or players != 2:
+            try:
+                players = int(input("How many players? (1/2) \n"))
+            except ValueError:
+                print("Please enter 1 or 2.")
+                continue
 
         selection = input(
             "Select the game: \n"
@@ -18,6 +24,7 @@ def selections():
             "4 - Blackjack\n"
             "5 - Connect 4\n" 
             "6 - Rock Paper Scissors\n"
+            "7 - Bordle (Wordle clone)\n"
         ).strip().lower()
 
         if selection in ("1", "naughts and crosses"):
@@ -56,8 +63,15 @@ def selections():
                   rockpaperscissors.start(players)
             else:
                  print("Rock paper scissors only supports 1 player")
+        elif selection in ("7", "bordle"):
+                if players == 1:
+                     import bordle
+                else:
+                     print("Bordle only supports 1 player")
         else:
             print("Please select game 1 or 2.")
+        
+             
 
 def main():
     selections()

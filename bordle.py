@@ -1,5 +1,6 @@
 import random
 import os
+import time
 os.system('')
 
 class Color:
@@ -29,13 +30,17 @@ def singleplayer():
     loop(word, correct)
 
 def check(word, guess, correct):
+    remaining = {}
     for i in range(5):
         if guess[i] == word[i]:
             correct[i] = 1
-        elif guess[i] in word:
-            correct[i] = 2
         else:
             correct[i] = 3
+            remaining[word[i]] = remaining.get(word[i], 0) + 1
+    for i in range(5):
+        if correct[i] == 3 and remaining.get(guess[i], 0) > 0:
+            correct[i] = 2
+            remaining[guess[i]] -= 1
     return correct
 
 def load_valid():
@@ -62,21 +67,44 @@ def show_letters(letters):
                 out = out + f" {l.upper()} "
         print(out)
 
-def won():
+def hint(hinttimes, word):
+    if hinttimes == 0:
+        print("Only 1 hint allowed")
+    else:
+        randint = random.randint(0,4)
+        textrand = randint + 1
+        print(f"The number {textrand} letter is {word[randint]}")
+
+def won(end, began):
+    timetaken = end - began
+    timetaken = round(timetaken)
+    print(f"You took {timetaken} seconds")
+    import main
+    main.selections()
+
+def loss(end, began):
+    timetaken = end - began
+    timetaken = round(timetaken)
+    print(f"You took {timetaken} seconds to lose the game")
     import main
     main.selections()
 
 def loop(word, correct):
     print("Welcome to bordle\n")
+    start = time.time()
     print("Guess the 5 letter word\n")
     print("_ _ _ _ _")
     VALID = load_valid()
     letters = {}
+    hinttimes = 1
     for i in range(1,7):
         guess = input("Word: ")
         guess = guess.lower()
         while len(guess) != 5 or guess not in VALID:
-            if len(guess) != 5:
+            if guess.lower() == "hint":
+                hint(hinttimes, word)
+                hinttimes = 0
+            elif len(guess) != 5:
                 print("Must be 5 letters")
             else:
                 print("Not in word list")
@@ -99,10 +127,12 @@ def loop(word, correct):
 
         if guess == word:
             print(f"{Color.CORRECT} {out} {Color.RESET}")
-            won()
+            end = time.time()
+            won(end, start)
             return
     print(f"Out of guesses. Word was {word}")
-    won()
+    end = time.time()
+    loss(end, start)
     return
 
 
