@@ -8,7 +8,7 @@ def selections():
         except ValueError:
             print("Please enter 1 or 2.")
             continue
-        while players != 1 or players != 2:
+        while players not in (1,2):
             try:
                 players = int(input("How many players? (1/2) \n"))
             except ValueError:
